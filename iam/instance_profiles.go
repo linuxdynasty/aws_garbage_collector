@@ -9,10 +9,10 @@ import (
 	"github.com/linuxdynasty/aws_garbage_collector/shared"
 )
 
-func (i *IAM) fetchAndStoreInstanceProfiles(client *iam.IAM, wg *sync.WaitGroup) {
+func (i *IAM) fetchAndStoreInstanceProfiles(wg *sync.WaitGroup) {
 	defer wg.Done()
 	params := &iam.ListInstanceProfilesInput{}
-	err := client.ListInstanceProfilesPages(params,
+	err := i.Client.ListInstanceProfilesPages(params,
 		func(resp *iam.ListInstanceProfilesOutput, lastPage bool) bool {
 			for _, ip := range resp.InstanceProfiles {
 				iprofile := models.IAMInstanceProfile{
@@ -22,7 +22,7 @@ func (i *IAM) fetchAndStoreInstanceProfiles(client *iam.IAM, wg *sync.WaitGroup)
 					InUse:            "false",
 					InUseByRoles:     "false",
 					InUseByInstances: "false",
-					Region:           *client.Config.Region,
+					Region:           i.Region,
 				}
 				if ip.Roles != nil {
 					rDb := i.DB.From("IAMInstanceProfile")

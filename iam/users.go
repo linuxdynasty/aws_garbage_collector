@@ -39,14 +39,14 @@ func (i *IAM) storeUserInlinePolicyResources(userArn string, resources []*iam.Po
 	}
 }
 
-func (i *IAM) storeUsers(client *iam.IAM, users []*iam.UserDetail, wg *sync.WaitGroup) {
+func (i *IAM) storeUsers(users []*iam.UserDetail, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for _, u := range users {
 		user := models.IAMUser{
 			ARN:                *u.Arn,
 			ID:                 *u.UserId,
 			Name:               *u.UserName,
-			Region:             *client.Config.Region,
+			Region:             i.Region,
 			GroupsCount:        int64(len(u.GroupList)),
 			ManagedPolicyCount: int64(len(u.AttachedManagedPolicies)),
 			InlinePolicyCount:  int64(len(u.UserPolicyList)),

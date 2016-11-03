@@ -55,14 +55,14 @@ func (i *IAM) storeGroupPolicyResources(policyArn string, resourceType string, r
 	}
 }
 
-func (i *IAM) fetchPolicyResources(client *iam.IAM, policy *models.IAMManagedPolicy) error {
+func (i *IAM) fetchPolicyResources(policy *models.IAMManagedPolicy) error {
 	params := &iam.ListEntitiesForPolicyInput{
 		PolicyArn: &policy.ARN,
 	}
 	policy.InUseByGroups = "false"
 	policy.InUseByUsers = "false"
 	policy.InUseByRoles = "false"
-	err := client.ListEntitiesForPolicyPages(params,
+	err := i.Client.ListEntitiesForPolicyPages(params,
 		func(resp *iam.ListEntitiesForPolicyOutput, lastPage bool) bool {
 			if len(resp.PolicyGroups) > 0 {
 				i.storeGroupPolicyResources(policy.ARN, "Groups", resp.PolicyGroups)
@@ -82,7 +82,7 @@ func (i *IAM) fetchPolicyResources(client *iam.IAM, policy *models.IAMManagedPol
 	return err
 }
 
-func (i *IAM) storePolicies(client *iam.IAM, policies []*iam.ManagedPolicyDetail, wg *sync.WaitGroup) {
+func (i *IAM) storePolicies(policies []*iam.ManagedPolicyDetail, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for _, p := range policies {
 		inUse := "false"
@@ -95,7 +95,7 @@ func (i *IAM) storePolicies(client *iam.IAM, policies []*iam.ManagedPolicyDetail
 			Name:             *p.PolicyName,
 			VersionId:        *p.DefaultVersionId,
 			AttachementCount: *p.AttachmentCount,
-			Region:           *client.Config.Region,
+			Region:           i.Region,
 			InUse:            inUse,
 		}
 
@@ -103,7 +103,7 @@ func (i *IAM) storePolicies(client *iam.IAM, policies []*iam.ManagedPolicyDetail
 			PolicyArn: &policy.ARN,
 			VersionId: &policy.VersionId,
 		}
-		resp, err := client.GetPolicyVersion(params)
+		resp, err := i.Client.GetPolicyVersion(params)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -111,7 +111,7 @@ func (i *IAM) storePolicies(client *iam.IAM, policies []*iam.ManagedPolicyDetail
 		var policyJson models.Policy
 		json.Unmarshal([]byte(decodedData), &policyJson)
 		policy.Policy = policyJson
-		i.fetchPolicyResources(client, &policy)
+		i.fetchPolicyResources(&policy)
 		if err := i.DB.Save(&policy); err != nil {
 			log.Fatal(err)
 		}

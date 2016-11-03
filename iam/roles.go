@@ -54,7 +54,7 @@ func (i *IAM) storeManagedPolicyRoleResources(roleArn string, resources []*iam.A
 	}
 }
 
-func (i *IAM) storeRoles(client *iam.IAM, roles []*iam.RoleDetail, wg *sync.WaitGroup) {
+func (i *IAM) storeRoles(roles []*iam.RoleDetail, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for _, r := range roles {
 		role := models.IAMRole{
@@ -62,7 +62,7 @@ func (i *IAM) storeRoles(client *iam.IAM, roles []*iam.RoleDetail, wg *sync.Wait
 			AssumeRoleDocument:   *r.AssumeRolePolicyDocument,
 			ID:                   *r.RoleId,
 			Name:                 *r.RoleName,
-			Region:               *client.Config.Region,
+			Region:               i.Region,
 			ManagedPolicyCount:   int64(len(r.AttachedManagedPolicies)),
 			InlinePolicyCount:    int64(len(r.RolePolicyList)),
 			InstanceProfileCount: int64(len(r.InstanceProfileList)),
