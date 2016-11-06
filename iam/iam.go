@@ -19,7 +19,7 @@ func (i *IAM) fetchAndStoreIAMResources() error {
 		func(resp *iam.GetAccountAuthorizationDetailsOutput, lastPage bool) bool {
 			var wg sync.WaitGroup
 			wg.Add(4)
-			go i.storeRoles(resp.RoleDetailList, &wg)
+			go i.StoreRoles(resp.RoleDetailList, &wg)
 			go i.storeUsers(resp.UserDetailList, &wg)
 			go i.storePolicies(resp.Policies, &wg)
 			go i.fetchAndStoreInstanceProfiles(&wg)
