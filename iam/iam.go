@@ -21,7 +21,7 @@ func (i *IAM) fetchAndStoreIAMResources() error {
 			wg.Add(4)
 			go i.StoreRoles(resp.RoleDetailList, &wg)
 			go i.storeUsers(resp.UserDetailList, &wg)
-			go i.storePolicies(resp.Policies, &wg)
+			go i.StorePolicies(resp.Policies, &wg)
 			go i.fetchAndStoreInstanceProfiles(&wg)
 			wg.Wait()
 

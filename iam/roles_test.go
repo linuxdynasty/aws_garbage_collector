@@ -21,7 +21,7 @@ func DecodePolicy(policy string) (decodedPolicy string) {
 	return decodedPolicy
 }
 
-func TestReader(t *testing.T) {
+func TestRoles(t *testing.T) {
 	encodedPolicy := `{"Version": "2012-10-17","Statement": [{"Effect": "Allow","Action": "*","Resource": "*"}]}}]}`
 	//decodedPolicy := DecodePolicy(encodedPolicy)
 	policyArn := "arn:aws:iam::123456789:policy/awsapp"

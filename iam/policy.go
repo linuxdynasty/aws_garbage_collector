@@ -82,7 +82,7 @@ func (i *IAM) fetchPolicyResources(policy *models.IAMManagedPolicy) error {
 	return err
 }
 
-func (i *IAM) storePolicies(policies []*iam.ManagedPolicyDetail, wg *sync.WaitGroup) {
+func (i *IAM) StorePolicies(policies []*iam.ManagedPolicyDetail, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for _, p := range policies {
 		inUse := "false"
