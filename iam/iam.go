@@ -20,7 +20,7 @@ func (i *IAM) fetchAndStoreIAMResources() error {
 			var wg sync.WaitGroup
 			wg.Add(4)
 			go i.StoreRoles(resp.RoleDetailList, &wg)
-			go i.storeUsers(resp.UserDetailList, &wg)
+			go i.StoreUsers(resp.UserDetailList, &wg)
 			go i.StorePolicies(resp.Policies, &wg)
 			go i.fetchAndStoreInstanceProfiles(&wg)
 			wg.Wait()
