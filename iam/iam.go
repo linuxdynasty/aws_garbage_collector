@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/iam"
 )
 
-func (i *IAM) fetchAndStoreIAMResources() error {
+func (i *IAM) FetchAndStoreIAMResources() error {
 	params := &iam.GetAccountAuthorizationDetailsInput{
 		Filter: []*string{
 			aws.String("LocalManagedPolicy"),
@@ -22,7 +22,7 @@ func (i *IAM) fetchAndStoreIAMResources() error {
 			go i.StoreRoles(resp.RoleDetailList, &wg)
 			go i.StoreUsers(resp.UserDetailList, &wg)
 			go i.StorePolicies(resp.Policies, &wg)
-			go i.fetchAndStoreInstanceProfiles(&wg)
+			go i.StoreInstanceProfiles(&wg)
 			wg.Wait()
 
 			return true
@@ -37,7 +37,7 @@ func (i *IAM) FetchAndStoreIAM(region string, wg *sync.WaitGroup) error {
 	session := session.New(&aws.Config{Region: &region})
 	i.Client = iam.New(session)
 	i.Region = region
-	if err := i.fetchAndStoreIAMResources(); err != nil {
+	if err := i.FetchAndStoreIAMResources(); err != nil {
 		log.Fatal(err)
 	}
 	return err

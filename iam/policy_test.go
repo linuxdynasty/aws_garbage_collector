@@ -1,6 +1,7 @@
 package iam
 
 import (
+	"fmt"
 	"sync"
 	"testing"
 
@@ -18,6 +19,33 @@ func (f *FakeIAMClient) GetAccountAuthorizationDetailsPages(input *awsiam.GetAcc
 }
 
 func (f *FakeIAMClient) ListInstanceProfilesPages(input *awsiam.ListInstanceProfilesInput, fn func(output *awsiam.ListInstanceProfilesOutput, lastPage bool) (shouldContinue bool)) error {
+	instanceProfileId := "123456789"
+	instanceProfileArn := "arn:aws:iam::123456789:instance-profile/aws-app-development"
+	instanceProfileName := "aws-app-development"
+	roleId := "987654321"
+	//roleArn := "arn:aws:iam::123456789:role/aws-app-development"
+	roleName := "aws-app-development"
+	roles := []*awsiam.Role{
+		&awsiam.Role{
+			//Arn:      &roleArn,
+			RoleId:   &roleId,
+			RoleName: &roleName,
+		},
+	}
+	instanceProfiles := []*awsiam.InstanceProfile{
+		&awsiam.InstanceProfile{
+			InstanceProfileId:   &instanceProfileId,
+			Arn:                 &instanceProfileArn,
+			InstanceProfileName: &instanceProfileName,
+			Roles:               roles,
+		},
+	}
+	output := &awsiam.ListInstanceProfilesOutput{
+		InstanceProfiles: instanceProfiles,
+	}
+	fmt.Println(output)
+
+	fn(output, true)
 	return nil
 }
 
@@ -100,7 +128,7 @@ func TestPolicies(t *testing.T) {
 	myiam.Client = client
 	myiam.Region = "us-west-2"
 	wg.Add(1)
-	myiam.StorePolicies(iamManagedPolicies, &wg)
+	go myiam.StorePolicies(iamManagedPolicies, &wg)
 	wg.Wait()
 	//myiam.FetchPolicyResources()
 	var iamPolicy models.IAMManagedPolicy

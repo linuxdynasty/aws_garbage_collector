@@ -66,7 +66,7 @@ func TestRoles(t *testing.T) {
 	var wg sync.WaitGroup
 	myiam := iam.DB(shared.DBC)
 	wg.Add(1)
-	myiam.StoreRoles(roleDetails, &wg)
+	go myiam.StoreRoles(roleDetails, &wg)
 	wg.Wait()
 	var iamRole models.IAMRole
 	myiam.DB.One("ARN", roleArn, &iamRole)
